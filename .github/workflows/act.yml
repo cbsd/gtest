@@ -1,4 +1,37 @@
-name: CI
+name: "Run builds (garm)"
+on:
+  workflow_dispatch:
+    inputs:
+      arch:
+        description: "architecture to build for"
+        required: true
+        default: "amd64"
+      version:
+        description: |
+          The new version string used for the OS image.
+          This should generally follow the pattern "(alpha|beta|stable|lts)-MMMM.m.p[-suffix]".
+          A tag using this version string will be added to the scripts repo.
+          The commit will include an updated 'version.txt' as well as updated ebuild submodules (see below).
+          Using a version with the pattern (alpha|beta|stable|lts)-MMMM.m.p (e.g. alpha-2342.0.0)
+          will create an official build; use a suffix for dev builds (e.g. alpha-3234.0.0-testbuild-thilo-1234).
+        required: true
+        default: "main-3239.0.0-nightly-20220514-0155"
+      image_formats:
+        description: |
+          Space-separated vendor formats to build.
+        required: true
+        default: qemu_uefi
+      runner_size:
+        description: |
+          size of runner to use.
+        required: true
+        default: flatcar-16
+
+
+permissions:
+  packages: write
+
+
 on: push
 
 jobs:
@@ -16,15 +49,3 @@ jobs:
       run: pwd
     - name: uname
       run: uname -a
-#    - name: git1
-#      run: git branch
-#    - name: git2
-#      run: git branch -a
-#    - name: get VM
-#      run: cbsd up cbsdfile=$( pwd )/CBSDfile
-#    - name: exec VM
-#      run: cbsd bexec jname=myvm1 date
-#    - name: update pkg
-#      run: env ASSUME_ALWAYS_YES=yes SIGNATURE_TYPE=none IGNORE_OSVERSION=yes pkg update -f
-#    - name: install mc
-#      run: env ASSUME_ALWAYS_YES=yes SIGNATURE_TYPE=none IGNORE_OSVERSION=yes pkg install mc
