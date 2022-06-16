@@ -1,0 +1,87 @@
+name: "Run builds (garm)"
+on:
+  workflow_dispatch:
+    inputs:
+      arch:
+        description: "architecture to build for"
+        required: true
+        default: "amd64"
+      version:
+        description: |
+          The new version string used for the OS image.
+          This should generally follow the pattern "(alpha|beta|stable|lts)-MMMM.m.p[-suffix]".
+          A tag using this version string will be added to the scripts repo.
+          The commit will include an updated 'version.txt' as well as updated ebuild submodules (see below).
+          Using a version with the pattern (alpha|beta|stable|lts)-MMMM.m.p (e.g. alpha-2342.0.0)
+          will create an official build; use a suffix for dev builds (e.g. alpha-3234.0.0-testbuild-thilo-1234).
+        required: true
+        default: "main-3239.0.0-nightly-20220514-0155"
+      image_formats:
+        description: |
+          Space-separated vendor formats to build.
+        required: true
+        default: qemu_uefi
+      runner_size:
+        description: |
+          size of runner to use.
+        required: true
+        default: flatcar-16
+
+
+permissions:
+  packages: write
+
+
+jobs:
+  packages:
+    name: "Build Flatcar packages"
+    runs-on:
+      - equinix
+      - ${{ github.event.inputs.runner_size }}
+    defaults:
+      run:
+        working-directory: scripts
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: scripts
+          fetch-depth: 0
+
+      - name: Prepare machine
+        shell: bash
+        run: |
+          sudo rm /bin/sh
+          sudo ln -s /bin/bash /bin/sh
+          sudo apt-get install -y ca-certificates curl gnupg lsb-release tree
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+          sudo usermod -a -G docker $USER
+
+      - name: Build packages
+        shell: bash
+        run: |
+          exec 2>&1
+          set +x
+          source ci-automation/packages.sh
+          packages_build "${{ github.event.inputs.version }}" "${{ github.event.inputs.arch }}"
+          df -h
+
+      - name: Buils image
+        shell: bash
+        run: |
+          exec 2>&1
+          source ci-automation/image.sh
+          image_build "${{ github.event.inputs.arch }}"
+          df -h
+
+      - name: VM image build
+        shell: bash
+        run: |
+          exec 2>&1
+          source ci-automation/vms.sh
+          vm_build "${{ github.event.inputs.arch }}" ${{ github.event.inputs.image_formats }}
+          df -h
+          tree -L 3 images/
