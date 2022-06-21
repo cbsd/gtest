@@ -20,4 +20,4 @@ jobs:
     - name: uname
       run: uname -a
     - name: iostat
-      run: /usr/sbin/iostat 1 60
+      run: /usr/sbin/iostat 1 600
