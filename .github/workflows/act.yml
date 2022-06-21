@@ -14,11 +14,11 @@ jobs:
     - name: git
       run: cat .git/config
     - name: ls
-      run: ls -la
+      run: ls -la /
     - name: pwd
       run: pwd
-    - name: ls
-      run: pwd && ls -la
+    - name: file
+      run: file -s README.md
     - name: uname
       run: uname -a
     - name: iostat
