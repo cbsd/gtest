@@ -1,4 +1,4 @@
-name: "Run builds (mybee)"
+name: "Run builds (garm)"
 on: push
 
 permissions:
@@ -10,7 +10,7 @@ jobs:
     runs-on: [freebsd]
     steps:
     - name: checkout sources
-      uses: convectix/checkout@master
+      uses: actions/checkout@v2
     - name: git
       run: cat .git/config
     - name: ls
@@ -19,5 +19,3 @@ jobs:
       run: pwd
     - name: uname
       run: uname -a
-    - name: iostat
-      run: /usr/sbin/iostat 1 60
