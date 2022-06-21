@@ -17,6 +17,8 @@ jobs:
       run: ls -la
     - name: pwd
       run: pwd
+    - name: ls
+      run: pwd && ls -la
     - name: uname
       run: uname -a
     - name: iostat
