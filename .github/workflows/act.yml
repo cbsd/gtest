@@ -6,7 +6,7 @@ permissions:
 
 jobs:
   linux:
-    name: FreeBSD build on node ${{ matrix.node_version }}
+    name: Build on node ${{ matrix.node_version }}
     runs-on: self-hosted
     steps:
     - name: checkout sources
