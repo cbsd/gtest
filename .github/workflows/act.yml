@@ -23,5 +23,3 @@ jobs:
       run: env
     - name: uname
       run: uname -a
-    - name: iostat
-      run: /usr/sbin/iostat -c 2
