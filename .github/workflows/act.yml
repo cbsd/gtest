@@ -6,7 +6,7 @@ permissions:
 
 jobs:
   linux:
-    name: Build on node ${{ matrix.node }} - ${{ matrix.architecture }} on ${{ matrix.os }}
+    name: Build on node ${{ matrix.node }} ${{ matrix.architecture }} ${{ matrix.os }}
     runs-on: self-hosted
     steps:
     - name: checkout sources
@@ -19,6 +19,8 @@ jobs:
       run: pwd
     - name: file
       run: file -s README.md
+    - name: env
+      run: env
     - name: uname
       run: uname -a
     - name: iostat
