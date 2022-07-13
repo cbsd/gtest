@@ -6,7 +6,7 @@ permissions:
 
 jobs:
   linux:
-    name: Build on node ${{ matrix.node }} ${{ matrix.architecture }} ${{ matrix.os }}
+    name: Build on self-hosted node ${{ matrix.node }} ${{ matrix.architecture }} ${{ matrix.os }}
     runs-on: self-hosted
     steps:
     - name: checkout sources
